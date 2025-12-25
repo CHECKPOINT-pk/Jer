@@ -90,24 +90,22 @@ def On():
                     return
                 subscription('[1;97m [•] You\'re Not Premium User ')
                 return
-            else:  # inserted
-                if 'user' in response:
+            else:  # Successful response, or non-error response
+                try:
                     result = json.loads(response)
-                else:  # inserted
-                    try:
-                        name = result['name']
-                    except:
-                        name = '-'
-                    else:  # inserted
-                        user = result['user']
-                        exp = result['expired']
-                        join = result['joined']
-                        date_today = arrow.now().format('YYYY-MM-DD')
-                        a = arrow.get(date_today)
-                        b = arrow.get(exp)
-                        delta = (b - a).days
-                        Menu()
-                else:  # inserted
+                    user = result['user']
+                    exp = result['expired']
+                    join = result['joined']
+                    date_today = arrow.now().format('YYYY-MM-DD')
+                    a = arrow.get(date_today)
+                    b = arrow.get(exp)
+                    delta = (b - a).days
+                    Menu()
+                except json.JSONDecodeError:
+                    print('[1;97m [•] Error: Invalid response from server. Retrying...')
+                    On()
+                except KeyError:
+                    print('[1;97m [•] Error: Missing user data in response. Retrying...')
                     On()
         print(f'[1;97m [•] Error: {e}')
         time.sleep(1)
