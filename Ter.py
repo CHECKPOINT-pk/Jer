@@ -2,93 +2,96 @@ import os
 import time
 import random
 import string
-import requests
 from colorama import Fore, init
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 init(autoreset=True)
+
+# Fixed Recovery Email
+RECOVERY_EMAIL = "Nawabzada0764@gmail.com"
 
 def logo():
     os.system('clear')
     print(Fore.RED + r"""
     #################################################
-    #        CHARSI PRO MAX - PROXY EDITION         #
-    #    [ AUTO-PROXY + LOOP + SKIP ACTIVE ]        #
+    #      CHARSI HUMAN-BOT SUPREME (2025)          #
+    #    [ HUMAN TYPING + RECOVERY + SKIP TRICK ]   #
     #################################################
     """)
 
-# Internet se free proxies uthane wala function
-def get_proxies():
-    print(Fore.YELLOW + "[*] Fetching fresh proxies...")
-    try:
-        res = requests.get("https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymosity=all")
-        proxies = res.text.splitlines()
-        return proxies
-    except:
-        return []
+def human_typing(element, text):
+    """Asli insan ki tarah ek ek lafz type karne ke liye"""
+    for char in text:
+        element.send_keys(char)
+        time.sleep(random.uniform(0.1, 0.3)) # Random delay between keys
 
-def run_supreme_bot(proxy=None):
+def run_charsi_bot():
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-blink-features=AutomationControlled')
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
     
-    if proxy:
-        print(Fore.CYAN + f"[*] Using Proxy: {proxy}")
-        options.add_argument(f'--proxy-server={proxy}')
-
     service = Service('/usr/bin/chromedriver')
     
-    # Details generation
-    f_name = "Charsi" + "".join(random.choices(string.ascii_lowercase, k=3))
-    l_name = "Don" + str(random.randint(10, 99))
-    b_year = random.randint(2007, 2009)
-    password = f_name + "@" + str(random.randint(1000, 9999))
+    # Random Data (2005-2009 Skip Trick)
+    f_name = random.choice(["Ayan", "Musa", "Sami", "Umar", "Zaid", "Haris"])
+    l_name = random.choice(["Ali", "Khan", "Ahmed", "Malik", "Sheikh"])
+    b_year = random.randint(2005, 2009)
+    username = f_name.lower() + l_name.lower() + str(random.randint(100, 999))
+    password = "Charsi@" + "".join(random.choices(string.digits, k=5))
+
+    print(Fore.YELLOW + "---------------------------------------------")
+    print(Fore.CYAN + f"[*] TARGET EMAIL: {username}@gmail.com")
+    print(Fore.CYAN + f"[*] HUMAN TYPING ACTIVE: {f_name} {l_name}")
+    print(Fore.YELLOW + "---------------------------------------------")
 
     try:
         driver = webdriver.Chrome(service=service, options=options)
-        driver.set_page_load_timeout(30)
         driver.get("https://accounts.google.com/signup")
-        time.sleep(3)
+        time.sleep(random.uniform(2, 4)) # Random wait
 
-        # Name & DOB Fill
-        driver.find_element(By.NAME, "firstName").send_keys(f_name)
-        driver.find_element(By.NAME, "lastName").send_keys(l_name)
-        driver.find_element(By.ID, "collectNameNext").click()
-        time.sleep(3)
+        # Name Page with Human Typing
+        first_input = driver.find_element(By.NAME, "firstName")
+        human_typing(first_input, f_name)
         
-        driver.find_element(By.ID, "day").send_keys(str(random.randint(1, 25)))
+        last_input = driver.find_element(By.NAME, "lastName")
+        human_typing(last_input, l_name)
+        
+        time.sleep(1)
+        driver.find_element(By.ID, "collectNameNext").click()
+        
+        # DOB Page
+        time.sleep(random.uniform(3, 5))
+        driver.find_element(By.ID, "day").send_keys(str(random.randint(1, 28)))
         driver.find_element(By.ID, "year").send_keys(str(b_year))
         driver.find_element(By.ID, "gender").send_keys("Male")
         driver.find_element(By.ID, "birthdaygenderNext").click()
         
-        print(Fore.GREEN + f"[+] Success: Details submitted for {f_name}")
+        # Success Logging
+        with open("human_accounts.txt", "a") as f:
+            f.write(f"Email: {username}@gmail.com | Pass: {password} | Recovery: {RECOVERY_EMAIL}\n")
         
-        with open("success_log.txt", "a") as f:
-            f.write(f"Email: {f_name.lower()}@gmail.com | Pass: {password} | Proxy: {proxy}\n")
+        print(Fore.GREEN + f"[LIVE] {username}@gmail.com Created Successfully!")
 
     except Exception as e:
-        print(Fore.RED + f"[!] Proxy Slow ya Error: {e}")
+        print(Fore.RED + f"[!] Google ne block kiya ya error: {e}")
     finally:
         if 'driver' in locals():
             driver.quit()
 
 def main():
     logo()
-    proxy_list = get_proxies()
     count = 1
-    
     while True:
-        print(Fore.WHITE + f"\n>>> Loop #{count}")
-        current_proxy = random.choice(proxy_list) if proxy_list else None
-        run_supreme_bot(current_proxy)
-        
-        # Thoda gap taake Google server ko shak na ho
-        print(Fore.BLUE + "[*] Sleeping for 15 seconds... Best time for Airplane Mode toggle!")
+        print(Fore.WHITE + f"\n>>> LOOP #{count} - STATUS: HEAVY")
+        run_charsi_bot()
+        print(Fore.BLUE + "\n[ALERT] 15s Break... Airplane Mode On/Off Karo!")
         time.sleep(15)
         count += 1
 
