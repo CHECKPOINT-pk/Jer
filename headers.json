@@ -1,0 +1,19 @@
+import json
+
+# --- External Header Load Karne Ka Method ---
+def load_headers():
+    try:
+        with open('headers.json', 'r') as f:
+            return json.load(f)
+    except:
+        # Default headers agar file na ho
+        return {"Content-Type": "application/x-www-form-urlencoded", "X-FB-HTTP-Engine": "Liger"}
+
+# --- External UA Load Karne Ka Method ---
+def get_random_ua():
+    try:
+        with open('ua_db.txt', 'r') as f:
+            lines = f.readlines()
+            return random.choice(lines).strip()
+    except:
+        return "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36"
