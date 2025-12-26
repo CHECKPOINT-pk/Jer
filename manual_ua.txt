@@ -1,0 +1,17 @@
+# --- Alag File Se User-Agent Uthany Wala Function ---
+def get_external_ua():
+    try:
+        # 'manual_ua.txt' naam ki file se random UA uthayega
+        ua_list = open('manual_ua.txt', 'r').read().splitlines()
+        return random.choice(ua_list)
+    except:
+        # Agar file na mili to default UA use karega
+        return "Dalvik/2.1.0 (Linux; U; Android 14; SM-S928B Build/UP1A.231005.007) [FBAN/FB4A;FBAV/440.0.0.10.99;]"
+
+# --- Proxy System (Optional) ---
+def get_proxy():
+    try:
+        prox = open('proxies.txt', 'r').read().splitlines()
+        return {"http": random.choice(prox), "https": random.choice(prox)}
+    except:
+        return None
