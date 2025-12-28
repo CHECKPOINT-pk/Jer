@@ -16,26 +16,25 @@ def logo():
 {yellow} | |___|  _  |/ ___ \|  _ < ___) || | 
 {green}  \____|_| |_/_/   \_\_| \_\____/|___|
 {white} -------------------------------------------
-{yellow}  OWNER    :  CHARSI BABA (UPDATED)
-{yellow}  VERSION  :  2025.V1 (BETA)
-{yellow}  TOOL     :  SAFEUM UNLIMITED CREATOR
+{yellow}  OWNER    :  CHARSI BABA (PROXY UPDATED)
+{yellow}  LOCATION :  LATVIA / AZERBAIJAN / POLAND
+{yellow}  VERSION  :  2025.V2 (BETA)
 {white} -------------------------------------------
     """)
 
-# 2025 Updated User-Agent
+# Updated 2025 User-Agent
 def get_ua():
     win = random.choice(['10.0', '11.0'])
     ver = random.randint(131, 135)
     build = random.randint(6700, 6900)
-    # Aapka manga hua format
     letter1 = random.choice(string.ascii_uppercase)
     num = random.randint(10, 99)
     letter2 = random.choice(string.ascii_uppercase)
     return f"Mozilla/5.0 (Windows NT {win}; Win64; x64){letter1}{num}{letter2} AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{ver}.0.{build}.150 Safari/537.36"
 
-def create_acc():
+def create_acc(proxy_url):
     user = 'charsi' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
-    pasw = 'charsi' + ''.join(random.choices(string.digits, k=7))
+    pasw = 'charsi' + ''.join(random.choices(string.digits, k=8))
     dev_id = str(uuid.uuid4())
     
     url = "https://core.safeum.com/api/v1/auth/register"
@@ -45,26 +44,38 @@ def create_acc():
         "device_id": dev_id, "app_version": "1.1.0.1332", "os": "Android"
     }
 
+    # Proxy Configuration
+    proxies = {
+        'http': proxy_url,
+        'https': proxy_url
+    }
+
     try:
-        res = requests.post(url, json=data, headers=headers, timeout=15)
+        # Request with Proxy
+        res = requests.post(url, json=data, headers=headers, proxies=proxies, timeout=15)
         if res.status_code == 200 and "Success" in res.text:
-            print(f"{green}[SUCCESS] {white}USER: {yellow}{user} {white}| PASS: {yellow}{pasw}")
+            print(f"{green}[SUCCESS] {white}USER: {yellow}{user} {white}| {green}PROXY: {proxy_url[:20]}...")
             with open("charsi_hits.txt", "a") as f:
                 f.write(f"{user}:{pasw}\n")
         else:
-            print(f"{red}[FAILED] {white}SERVER BUSY OR LIMIT FOR: {user}")
+            print(f"{red}[FAILED] {white}SERVER BLOCKED PROXY: {red}{proxy_url[:15]}...")
     except:
-        print(f"{red}[!] CONNECTION ERROR - CHECK VPN")
+        print(f"{red}[!] PROXY ERROR - DEAD OR SLOW")
 
 if __name__ == "__main__":
     logo()
-    try:
-        limit = int(input(f"{green}[?] {white}KITNE ACCOUNTS BANANE HAIN? : {yellow}"))
-        print(f"{white}-------------------------------------------")
+    print(f"{yellow}[!] Make sure your proxy list has Poland/Latvia/Azerbaijan IPs")
+    
+    # Proxy list load karein
+    # File format: ip:port OR user:pass@ip:port
+    if not os.path.exists("proxies.txt"):
+        with open("proxies.txt", "w") as f: f.write("ip:port")
+        print(f"{red}[!] proxies.txt file bana di gayi hai. Isme proxies dalein.")
+    else:
+        proxy_list = open("proxies.txt", "r").read().splitlines()
+        limit = int(input(f"{green}[?] {white}KITNE ACCOUNTS? : {yellow}"))
+        
         for _ in range(limit):
-            create_acc()
-            time.sleep(1.5) # Anti-ban delay
-        print(f"{white}-------------------------------------------")
-        print(f"{green}[+] DONE! ACCOUNTS SAVED IN charsi_hits.txt")
-    except ValueError:
-        print(f"{red}[!] INVALID INPUT")
+            current_proxy = random.choice(proxy_list)
+            create_acc(f"http://{current_proxy}")
+            time.sleep(1)
