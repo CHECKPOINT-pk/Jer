@@ -1,81 +1,89 @@
 import requests, random, string, uuid, time, os
 
-# Colors for Charsi Theme
-green = '\033[1;32m'
-yellow = '\033[1;33m'
-white = '\033[1;37m'
-red = '\033[1;31m'
-reset = '\033[0m'
+# Charsi 1380 Theme Colors
+G = '\033[1;32m' # Green
+Y = '\033[1;33m' # Yellow
+W = '\033[1;37m' # White
+R = '\033[1;31m' # Red
+C = '\033[1;36m' # Cyan
 
-def logo():
+def logo_1380():
     os.system('clear')
     print(f"""
-{green}  ____ _   _    _    ____  ____ ___ 
-{green} / ___| | | |  / \  |  _ \/ ___|_ _|
-{yellow} | |   | |_| | / _ \ | |_) \___ \ | | 
-{yellow} | |___|  _  |/ ___ \|  _ < ___) || | 
-{green}  \____|_| |_/_/   \_\_| \_\____/|___|
-{white} -------------------------------------------
-{yellow}  OWNER    :  CHARSI BABA (PROXY UPDATED)
-{yellow}  LOCATION :  LATVIA / AZERBAIJAN / POLAND
-{yellow}  VERSION  :  2025.V2 (BETA)
-{white} -------------------------------------------
+{G}   ____ _   _    _    ____  ____ ___ 
+{G}  / ___| | | |  / \  |  _ \/ ___|_ _|
+{Y}  | |   | |_| | / _ \ | |_) \___ \ | | 
+{Y}  | |___|  _  |/ ___ \|  _ < ___) || | 
+{G}  \____|_| |_/_/   \_\_| \_\____/|___|
+{W} -------------------------------------------
+{C}  TARGET  : {G}SAFEUM v1.1.0.1380
+{C}  METHOD  : {W}API-V1-INJECTION
+{C}  STATUS  : {Y}STABLE & RUNNING
+{W} -------------------------------------------
     """)
 
-# Updated 2025 User-Agent
-def get_ua():
-    win = random.choice(['10.0', '11.0'])
-    ver = random.randint(131, 135)
-    build = random.randint(6700, 6900)
-    letter1 = random.choice(string.ascii_uppercase)
-    num = random.randint(10, 99)
-    letter2 = random.choice(string.ascii_uppercase)
-    return f"Mozilla/5.0 (Windows NT {win}; Win64; x64){letter1}{num}{letter2} AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{ver}.0.{build}.150 Safari/537.36"
+class Charsi1380:
+    def __init__(self):
+        self.url = "https://core.safeum.com/api/v1/auth/register"
+        # 1380 specific session handling
+        self.session = requests.Session()
 
-def create_acc(proxy_url):
-    user = 'charsi' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
-    pasw = 'charsi' + ''.join(random.choices(string.digits, k=8))
-    dev_id = str(uuid.uuid4())
-    
-    url = "https://core.safeum.com/api/v1/auth/register"
-    headers = {'User-Agent': get_ua(), 'Content-Type': 'application/json'}
-    data = {
-        "username": user, "password": pasw, 
-        "device_id": dev_id, "app_version": "1.1.0.1332", "os": "Android"
-    }
+    def get_1380_headers(self, dev_id):
+        return {
+            'User-Agent': f"SafeUM/1.1.0.1380 (Android 11; SM-A515F; {dev_id})",
+            'X-SafeUM-App-Version': '1.1.0.1380',
+            'X-SafeUM-Device-ID': dev_id,
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive'
+        }
 
-    # Proxy Configuration
-    proxies = {
-        'http': proxy_url,
-        'https': proxy_url
-    }
+    def start_making(self):
+        # Unique ID per registration
+        dev_id = str(uuid.uuid4())
+        user = 'charsi' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
+        pasw = 'charsi' + ''.join(random.choices(string.digits, k=8))
+        
+        payload = {
+            "username": user,
+            "password": pasw,
+            "device_id": dev_id,
+            "app_version": "1.1.0.1380",
+            "os": "Android",
+            "language": "en_US"
+        }
 
-    try:
-        # Request with Proxy
-        res = requests.post(url, json=data, headers=headers, proxies=proxies, timeout=15)
-        if res.status_code == 200 and "Success" in res.text:
-            print(f"{green}[SUCCESS] {white}USER: {yellow}{user} {white}| {green}PROXY: {proxy_url[:20]}...")
-            with open("charsi_hits.txt", "a") as f:
-                f.write(f"{user}:{pasw}\n")
-        else:
-            print(f"{red}[FAILED] {white}SERVER BLOCKED PROXY: {red}{proxy_url[:15]}...")
-    except:
-        print(f"{red}[!] PROXY ERROR - DEAD OR SLOW")
+        try:
+            # 1380 API response is faster, so timeout is 15s
+            res = self.session.post(self.url, json=payload, headers=self.get_1380_headers(dev_id), timeout=15)
+            
+            if res.status_code == 200:
+                if "Success" in res.text:
+                    print(f"{G}[SUCCESS-1380] {W}{user}:{pasw}")
+                    with open("charsi_1380_hits.txt", "a") as f:
+                        f.write(f"{user}:{pasw}\n")
+                elif "AlreadyExists" in res.text:
+                    print(f"{R}[!] {W}User Taken, changing name...")
+                    self.start_making()
+                else:
+                    print(f"{R}[FAILED] {W}IP Blocked or Proxy Dead!")
+            else:
+                print(f"{R}[ERROR] {W}Server Busy (Code: {res.status_code})")
+                
+        except Exception:
+            print(f"{R}[!] CONNECTION ERROR {W}- VPN Check Karein!")
 
 if __name__ == "__main__":
-    logo()
-    print(f"{yellow}[!] Make sure your proxy list has Poland/Latvia/Azerbaijan IPs")
-    
-    # Proxy list load karein
-    # File format: ip:port OR user:pass@ip:port
-    if not os.path.exists("proxies.txt"):
-        with open("proxies.txt", "w") as f: f.write("ip:port")
-        print(f"{red}[!] proxies.txt file bana di gayi hai. Isme proxies dalein.")
-    else:
-        proxy_list = open("proxies.txt", "r").read().splitlines()
-        limit = int(input(f"{green}[?] {white}KITNE ACCOUNTS? : {yellow}"))
-        
-        for _ in range(limit):
-            current_proxy = random.choice(proxy_list)
-            create_acc(f"http://{current_proxy}")
-            time.sleep(1)
+    logo_1380()
+    bot = Charsi1380()
+    try:
+        limit = int(input(f"{C}[?] {W}KITNE ACCOUNTS? : {Y}"))
+        print(f"{W}-------------------------------------------")
+        for i in range(limit):
+            bot.start_making()
+            # 1380 server needs 3-4 sec gap to avoid 'Too many attempts'
+            time.sleep(3.5)
+        print(f"{W}-------------------------------------------")
+        print(f"{G}[+] HITS SAVED: charsi_1380_hits.txt")
+    except KeyboardInterrupt:
+        print(f"\n{R}[!] Stopped!")
