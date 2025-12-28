@@ -11,49 +11,54 @@ except:
     os.system('pip install websocket-client')
     from websocket import create_connection
 
-# --- PRO COLORS ---
-Y = '\033[1;33m'  # Yellow
-G = '\033[1;32m'  # Green
-R = '\033[1;31m'  # Red
-W = '\033[1;37m'  # White
+# --- PRO THEME COLORS ---
+Y = '\033[1;33m' # Yellow (Main Theme)
+G = '\033[1;32m' # Green
+R = '\033[1;31m' # Red
+W = '\033[1;37m' # White
 
-# --- CONFIG ---
-VERSION = "1.1.0.1640"  # Same as your file
-FILE_NAME = "Charsi_SafeUM_Success.txt"
+# --- CONFIG (Same as login-acount.py) ---
+VERSION = "1.1.0.1640"
+FILE_SAVE = "Charsi_Hits.txt"
+success = 0
+failed = 0
 
 def charsi_banner():
     os.system('clear')
-    print(Y + pyfiglet.figlet_format("GHOST-1640"))
+    # Same Logo Style
+    logo = pyfiglet.figlet_format("CHARSI-PRO", font="slant")
+    print(Y + logo)
     print(G + " ╔" + "═"*46 + "╗")
-    print(Y + f" ║ VERSION : {VERSION} (MATCHED WITH YOUR FILE) ║")
-    print(Y + " ║ NETWORK : TELENOR BYPASS ACTIVE             ║")
-    print(Y + " ║ FORMAT  : username:mmmm                      ║")
+    print(Y + " ║  AUTHOR   : MR. GHOST (CHARSI EDITION)    ║")
+    print(Y + " ║  METHOD   : HEAVY WSS (VERSION 1.1.0.1640)║")
+    print(Y + " ║  NETWORK  : TELENOR/ALL (BYPASS ACTIVE)   ║")
+    print(Y + " ║  FORMAT   : USERNAME:mmmm                 ║")
     print(G + " ╚" + "═"*45 + "╝" + W)
 
-def work():
-    global success, failed, retry
-    # Generate random 15-char username
-    user = ''.join(choices(string.ascii_lowercase, k=15))
+def work_engine():
+    global success, failed
+    # Random Username: hsjakaoqworiiww style
+    user = ''.join(choices(string.ascii_lowercase, k=14))
     
-    # SafeUM Servers
+    # SafeUM Heavy Nodes
     nodes = ["193.200.173.45", "51.79.208.190", "164.92.111.139"]
     node = random.choice(nodes)
 
     try:
-        # Step 1: Secure Connection
-        con = create_connection(
+        # Secure Handshake
+        ws = create_connection(
             f"wss://{node}/Auth",
             header={
                 "app": "com.safeum.android",
                 "remoteIp": node,
                 "remotePort": "8080",
-                "softwareversion": VERSION
+                "User-Agent": "SafeUM/1.1.0.1640 (Android 12; Xiaomi 220733SPH)"
             },
             sslopt={"cert_reqs": CERT_NONE},
-            timeout=15
+            timeout=20
         )
 
-        # Step 2: Payload (Matched with login-acount.py logic)
+        # Same Payload Structure as your file
         payload = {
             "action": "Register",
             "subaction": "Desktop",
@@ -77,36 +82,37 @@ def work():
             "magicwordhint": "0000",
             "devicename": "Xiaomi 220733SPH",
             "softwareversion": VERSION,
-            "nickname": "charsi_" + str(random.randint(100, 999)),
             "os": "AND",
             "deviceuid": os.urandom(8).hex(),
-            "devicepushuid": f"*eL-{os.urandom(60).hex()}",
+            "devicepushuid": f"*eL-{os.urandom(55).hex()}",
             "osversion": "and_12.0.0",
             "id": str(random.randint(1111111111, 1999999999))
         }
 
-        con.send(dumps(payload))
-        response = decompress(con.recv()).decode('utf-8')
+        ws.send(dumps(payload))
+        response = decompress(ws.recv()).decode('utf-8')
 
         if '"status":"Success"' in response:
-            # Format: username:mmmm
+            success += 1
             account_hit = f"{user}:mmmm"
             print(f"\n{G}[SUCCESS] {account_hit}")
-            with open(FILE_NAME, "a") as f:
+            with open(FILE_SAVE, "a") as f:
                 f.write(account_hit + "\n")
-        
-        con.close()
+        else:
+            failed += 1
+        ws.close()
     except:
         pass
 
-# --- MAIN ---
-success, failed, retry = 0, 0, 0
+# --- RUNNER ---
 charsi_banner()
+print(Y + " [*] Engine starting... Telenor bypass active.")
 
-# Telenor ke liye 20 threads stable hain
-with ThreadPoolExecutor(max_workers=20) as ghost:
+# 20 threads for high speed & stability
+with ThreadPoolExecutor(max_workers=20) as executor:
     while True:
-        ghost.submit(work)
-        sys.stdout.write(f"\r {W}[{G}v1640{W}] Engine Running... Check {FILE_NAME}")
+        executor.submit(work_engine)
+        # Professional Live Dashboard
+        sys.stdout.write(f"\r {W}[{Y}GHOST-PRO{W}] OK:[{G}{success}{W}] FAIL:[{R}{failed}{W}]")
         sys.stdout.flush()
         time.sleep(0.05)
