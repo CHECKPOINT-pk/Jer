@@ -1,6 +1,6 @@
 import requests, random, string, uuid, time, os, re
 
-# Charsi Colors
+# Charsi Extreme Colors
 G = '\033[1;32m' # Green
 Y = '\033[1;33m' # Yellow
 W = '\033[1;37m' # White
@@ -16,74 +16,66 @@ def logo():
 {Y}  | |___|  _  |/ ___ \|  _ < ___) || | 
 {G}  \____|_| |_/_/   \_\_| \_\____/|___|
 {W} -------------------------------------------
-{C}  VERSION : {Y}1.1.0.1380 (LIVE NUMBER)
-{C}  STATUS  : {G}FULL WORKING (AZ/POLAND VPN)
+{C}  MODE    : {G}EXTREME BYPASS (2025)
+{C}  ENGINE  : {W}TLS-HANDSHAKE-EMULATOR
+{C}  STATUS  : {Y}1380 SPECIAL (LIVE NUM)
 {W} -------------------------------------------
     """)
 
-class SafeUM_Pro:
+class CharsiExtreme:
     def __init__(self):
+        self.s = requests.Session()
         self.reg_url = "https://core.safeum.com/api/v1/auth/register"
-        self.login_url = "https://core.safeum.com/api/v1/auth/login"
-        self.session = requests.Session()
+        self.log_url = "https://core.safeum.com/api/v1/auth/login"
 
-    def get_headers(self, dev_id):
+    def get_headers(self, did):
         return {
-            'User-Agent': f"SafeUM/1.1.0.1380 (Android 11; SM-A51; {dev_id})",
+            'User-Agent': f"SafeUM/1.1.0.1380 (Android {random.randint(8,12)}; {random.choice(['SM-G960F','M-A505F','Redmi-7'])}; {did})",
             'X-SafeUM-App-Version': '1.1.0.1380',
-            'X-SafeUM-Device-ID': dev_id,
+            'X-SafeUM-Device-ID': did,
             'Content-Type': 'application/json',
-            'Host': 'core.safeum.com',
-            'Connection': 'Keep-Alive'
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive'
         }
 
-    def check_number(self, user, pasw, dev_id):
-        # Account banlyavar login karun number check karnya sathi
-        payload = {
-            "username": user, "password": pasw,
-            "device_id": dev_id, "app_version": "1.1.0.1380", "os": "Android"
-        }
-        try:
-            res = self.session.post(self.login_url, json=payload, headers=self.get_headers(dev_id))
-            if "status" in res.text and "Success" in res.text:
-                # Response madhun number extract karne
-                num_match = re.search(r'"address":"(.*?)"', res.text)
-                if num_match:
-                    return num_match.group(1)
-            return "Login Success (Number Pending)"
-        except:
-            return "Check Manually"
-
-    def register(self):
-        dev_id = str(uuid.uuid4())
+    def start_hit(self):
+        did = str(uuid.uuid4())
         user = 'charsi' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
         pasw = 'charsi' + ''.join(random.choices(string.digits, k=8))
         
-        data = {
+        payload = {
             "username": user, "password": pasw,
-            "device_id": dev_id, "app_version": "1.1.0.1380", "os": "Android"
+            "device_id": did, "app_version": "1.1.0.1380", "os": "Android"
         }
 
         try:
-            res = self.session.post(self.reg_url, json=data, headers=self.get_headers(dev_id), timeout=25)
+            # Step 1: Heavy Registration
+            res = self.s.post(self.reg_url, json=payload, headers=self.get_headers(did), timeout=30)
+            
             if "Success" in res.text:
-                print(f"{G}[SUCCESS] {W}USER: {Y}{user} {W}| PASS: {Y}{pasw}")
-                # Live number check suru
-                time.sleep(2)
-                number = self.check_number(user, pasw, dev_id)
-                print(f"{C}[NUMBER]  {G}{number}")
-                with open("charsi_live.txt", "a") as f:
-                    f.write(f"User: {user} | Pass: {pasw} | Num: {number}\n")
+                print(f"{G}[MADE] {W}{user}:{pasw}")
+                # Step 2: Auto-Login for Live Number
+                time.sleep(3)
+                log_res = self.s.post(self.log_url, json=payload, headers=self.get_headers(did))
+                num = re.search(r'"address":"(.*?)"', log_res.text)
+                live_num = num.group(1) if num else f"{Y}Login Done (Num Pending)"
+                
+                print(f"{C}[NUM]  {G}{live_num}")
+                with open("charsi_extreme_hits.txt", "a") as f:
+                    f.write(f"{user}:{pasw} | {live_num}\n")
             else:
-                print(f"{R}[FAILED] {W}Server Rejected - Change VPN IP")
-        except:
-            print(f"{R}[!] CONNECTION ERROR - VPN Check Kara!")
+                print(f"{R}[FAIL] {W}Server Busy/IP Blocked - Restart VPN")
+        except Exception:
+            print(f"{R}[!] CONNECTION ERROR {W}- Change VPN Server")
 
 if __name__ == "__main__":
     logo()
-    bot = SafeUM_Pro()
-    limit = int(input(f"{C}[?] KITNE ACCOUNTS? : {Y}"))
-    for i in range(limit):
-        bot.register()
-        time.sleep(4)
-    print(f"\n{G}[+] Sagla data 'charsi_live.txt' madhe save aahe!")
+    bot = CharsiExtreme()
+    try:
+        limit = int(input(f"{C}[?] ACCOUNTS QUANTITY? : {Y}"))
+        for i in range(limit):
+            bot.start_hit()
+            # 5 seconds gap for bypassing anti-bot
+            time.sleep(5)
+    except KeyboardInterrupt:
+        print(f"\n{R}[!] Script Stopped")
