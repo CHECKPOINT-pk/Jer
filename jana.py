@@ -80,6 +80,7 @@ device = {
     'fbsv':fbsv,
     'fbca':fbca,
     'fbdm':fbdm}
+
     logo=("""\033[1;32m
   
 ╱╱╭┳━━━┳━━━┳━━━┳╮╱╱╭╮
